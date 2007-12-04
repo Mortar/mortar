@@ -1,0 +1,14 @@
+from mortar import getRoot,new
+
+root = getRoot()
+
+print root.names
+
+cs = root['contents']
+
+cs.add(new())
+
+for c in cs:
+    print c.id
+    print c.names
+    print c.type
