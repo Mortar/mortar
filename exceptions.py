@@ -5,7 +5,7 @@ class NotPossible(Exception):
 
 class NotAllowed(NotPossible):
     """
-    User nto authorised to perform action.
+    User not authorised to perform action.
     """
 
 class NotFound(NotPossible):
@@ -16,6 +16,6 @@ class NotFound(NotPossible):
 class NotSupported(NotPossible):
     """
     This action is never going to be possible.
-    ie:writing to field not present in rdb column.
+    ie:writing to field whose name does not have a matching relational column.
     """
 
