@@ -1,67 +1,53 @@
-#from zope.app.container.interfaces import IContainer,IContainer
 from zope.interface import Interface, Attribute
 
 marker = object()
 
-class IIdentifier(Interface):
-
-    storage = Attribute("""
-              The name the storage was registered with in the storage module.
-              """)
-    
-    name = Attribute("""
-           """)
-
-    def __str__(self):
-        """
-        """
-
-
 class IContent(Interface):
     """
-    Represents a content object with a dynamic, persistent schema.
+    All content must implement this schema.
     Security should be checked for each operation.
     """
 
-    id = Attribute("""
-         A unique identifier, that must be representable as a string,
-         for this object across the whole site.
+    id = Attribute(
+       """
+       A unique identifier, that must be representable as a string,
+       for this object across the whole site.
 
-         This may also be None, indicating that it has not yet been
-         stored anywhere.
-         """)
+       This may also be None, indicating that it has not yet been
+       stored anywhere.
+       """
+       )
 
-    type = Attribute("""
-           The type of this IContent. 
-           """)
+    type = Attribute(
+       """
+       The type of this IContent. 
+       """)
 
-    names = Attribute("""
-            The names currently available in this IContent
-            """)
+    names = Attribute(
+       """
+       The names of the fields currently available in this IContent
+       """
+       )
 
     def __getitem__(name):
         """
-        can raise various things
+        Get a field of the specified name.
+        Returns an object implementing IField.
         """
 
     def __setitem__(name,value):
         """
-        can raise various things
-        """
-
-    def get(name,default=marker,asType=None):
-        """
-        can raise various things
-        """
-
-    def set(name,value,asType=None):
-        """
-        can raise various things
+        Set a field of the specified name.
+        The value may implement IField or be of a type for which a
+        converter to IField has been registered.  
         """
 
     def view(name=None):
         """
         returns the view object or the default view if no name is specified.
+
+        A KeyError is raised if the named view cannot be found or if
+        there is no default view available for this IContent.
         """
 
     def dimension(name,id=None):
@@ -71,19 +57,39 @@ class IContent(Interface):
         eg: c.dimension('revision',1).dimension('language','french')
         """
         
-    def canSet(name):
+class IField(Interface):
+    "A single field of a piece of content"
+
+    def get(as=None,default=marker):
         """
-        returns boolean saying whether the name can be set by the current
+        Return the value of the field in the type specified.
+        If the IContent does not have a value, return the default
+        specified or, if the default is the marker, the default value
+        specified in the content type. If this IContent has no content
+        type, return None.
+        The type specified must implement IFieldType.
+        """
+
+    def set(value,as=None):
+        """
+        Set this field to the supplied value. If a type is supplied,
+        the value will be converted to this type before being
+        stored. Any type supplied must implement IFieldType.
+        """
+
+    def canSet():
+        """
+        returns boolean saying whether this field can be set by the current
         user.
         """
 
-    def canGet(name):
+    def canGet():
         """
-        returns boolean saying whether the name can be accessed by the current
+        returns boolean saying whether this field can be accessed by the current
         user.
         """
 
-class IResultSet(Interface):
+class ICollection(Interface):
     """
     The result of a search
     """
@@ -118,20 +124,7 @@ class IResultSet(Interface):
         value can be an id or an IContent.
         """
         
-class IView(Interface):#zope3viewthingy,IControl):
-    """
-    A view control, for accumulating other controls
-    """
-
-    controls = Attribute(
-        """
-        dict? containing all sub-controls
-        """)
-        
-    def __call__(self):
-        pass
-
-class IStorage(Interface):#IContainer):
+class IStorage(Interface):
     """
     A physical storage for content objects.
     This could be a relational, file system or zodb storage.
@@ -161,15 +154,13 @@ class IStorage(Interface):#IContainer):
         """
         """
         
-"""
-search utility
-  |
-  \/
-vyper-based indexing
-  |
-  \/
-storage-based indexing
-"""
+class IView(Interface):
+    """
+    A view control, for accumulating other controls
+    """
+
+    def __call__(self):
+        pass
 
 class IControl(Interface):
     """
@@ -192,5 +183,12 @@ class IControl(Interface):
     def render():
         """
         """
+
+class IFieldType(Interface):
+    """
+    Not quite sure yet...
+    """
+    pass
+
 
 
