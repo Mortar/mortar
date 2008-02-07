@@ -1,0 +1,71 @@
+The Content Interface
+
+  Everything in Mortar is about content. The most basic interfaces in
+  Mortar are for working with content in a very generic fashion.
+
+  So, lets start by creating a piece of content:
+
+  >>> from mortar import content
+  >>> fred = content()
+
+  Lets give Fred a name:
+
+  >>> fred['name'].set('Fred')
+
+  Maybe Fred also needs an age:
+
+  >>> fred['age'] = 42
+
+  You can see here that we have two different ways of setting fields
+  on a piece of content. The reason for this is in case we need to be
+  more expressive:
+
+  >>> from mortar import types
+  >>> fred['date of birth'].set('1965/11/01',as=types.date)
+  
+  We can now see that Fred's date of birth has been stored as a date:
+
+  >>> fred['date of birth'].get()
+  datetime(1965,11,1)
+
+  If we wanted his date of birth as a string, we could use a similarly
+  more expressive version of get:
+
+  >>> fred['date of birth'].get(as=types.string)
+  '1965/11/01'
+
+  Now that we have a date of birth, we don't need an age anymore:
+
+  >>> del fred['age']
+
+  As with many things, we've also remembered that it's often a good
+  idea to store first and last names seperately:
+
+  >>> fred['first name'] = fred['name']
+  >>> fred['name'].delete()
+  >>> fred['last name'] = 'Jones'
+
+  Okay, so now we want to record Fred's address. Ww already know that
+  adding address fields to our existing content for Fred is probably a
+  bad idea, so lets store his address in a seperate piece of content:
+
+  >>> address = content()
+  >>> address['number'] = 1
+  >>> address['road'] = 'doe avenue'
+
+  Now we can specify that this is Fred's address:
+
+  >>> fred['address'] = address
+
+  
+  >>> address2 = content()
+  >>> address2['number'] = 1
+  >>> address2['road'] = 'doe avenue'
+
+  Blah
+
+  We can see what fields are actually in any piece of content by
+  looking at the 'names' attribute of that content:
+
+  >>> fred.names
+  ['name','date of birth','first name','last name','address']

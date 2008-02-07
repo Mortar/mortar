@@ -1,5 +1,5 @@
-from exceptions import NotFound
-from interfaces import IContent,marker
+from field import Field
+from interfaces import IContent,IField,IFieldType
 from zope.interface import implements
 
 class Content:
@@ -8,32 +8,32 @@ class Content:
 
     id = None
 
-    def __init__(self,type):
-        self.type = type
+    def __init__(self):
         self.data = {}
 
     def __getitem__(self,name):
-        return self.get(name)
+        if not self.data.has_key(name):
+            self.data[name] = Field()
+        return self.data[name]
 
-    def __setitem(self,name,value):
-        self.data[name]=value
+    def __setitem__(self,name,value):
+        if not IField.implementedBy(value):
+            v = IFieldType(value)
+            value = Field()
+            value.set(v)
+        self.data[name]=IField(value)
 
-    def get(self,name,default=marker,asType=None):
-        v = self.data.get(name,default)
-        if v is marker:
-            raise NotFound(name)
-        # XXX asType?
-        return v
+    @property
+    def names(self):
+        return self.data.keys()
 
-    def set(self,name,value,asType=None):
-        # XXX asType?
-        self.data[name]=value
-            
-    def canSet(name):
-        return True
+    @property
+    def type(self):
+        return None
+        raise NotImplementedError
 
-    def canGet(name):
-        return self.data.has_key(name)
-
-    
+    def view(self,name=None):
+        raise NotImplementedError
         
+    def dimension(self,name,id=None):
+        raise NotImplementedError
