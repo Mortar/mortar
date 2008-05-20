@@ -14,5 +14,3 @@ def str_to_date(str):
     
 
 provideAdapter(str_to_date,(str,),date_type)
-
-import pdb; pdb.set_trace()

@@ -128,32 +128,21 @@ class IStorage(Interface):
     """
     A physical storage for content objects.
     This could be a relational, file system or zodb storage.
-    Whatever implements IContentStorage is responsible for managing
-    transactional integrity.
-
-    The keys used in all IContainer methods are uids for IContentObjects
     """
 
-    def search(search):
+    def load(id):
         """
-        Provides a way to access the most efficient search infrastructure
-        of the underlyings storage.
-
-        eg: SELECT statements for a relational storage
-
-        'search' must implement either ISearch or an interface for the storage
-        in question.
-
-        ie: when writing a storage, an adapter from ISearch must be provided
-            to the interface describing the low level search terms.
-            Alternatively, specific low level search terms can be provided
-            directly.
-        """
-
-    def getByName(name):
-        """
+        Load the content specified by id, return an IContent or
+        raise an exception from mortar.exceptions.
         """
         
+    def store(id,content):
+        """
+        Save the content specified by id and provided in the 'content'
+        parameter. The 'content' will provide IContent.
+        May raise exceptions from mortar.exceptions.
+        """
+
 class IView(Interface):
     """
     A view control, for accumulating other controls
