@@ -9,13 +9,13 @@ class datetime:
 class time:
     pass
 
-class number:
+class number(IFieldType):
     pass
 
-class text:
+class text(IFieldType):
     pass
 
-class reference:
+class reference(IFieldType):
     pass
 
 class references:

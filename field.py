@@ -1,4 +1,5 @@
 from interfaces import IField,marker
+from types import text
 from zope.interface import implements
 
 class Field:
@@ -7,6 +8,18 @@ class Field:
     
     implements(IField)
 
+    def __init__(self,content,name):
+        self.content = content
+        self.name = name
+    
+    def __unicode__(self):
+        return text(self.value)
+
+    def __repr__(self):
+        return '<Field %r containing %r>' % (
+            self.name,
+            self.value
+            )
     
     def get(self,as=None,default=marker):
         if self.value is marker:
@@ -18,11 +31,10 @@ class Field:
         else:
             v = self.value
         if as is not None:
-            raise NotImplementedError            
+            v = as(v)
         return v
 
     def set(self,value,as=None):
-        # xxx type conversion should go in here
         if as is not None:            
             value = as(value)
         self.value = value
@@ -35,3 +47,5 @@ class Field:
         raise NotImplementedError
         return self.data.has_key(name)
 
+    def delete(self):
+        del self.content[self.name]

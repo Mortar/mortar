@@ -11,7 +11,7 @@ class IContent(Interface):
     id = Attribute(
        """
        A unique identifier, that must be representable as a string,
-       for this object across the whole site.
+       for this object across the whole system.
 
        This may also be None, indicating that it has not yet been
        stored anywhere.
@@ -89,6 +89,12 @@ class IField(Interface):
         user.
         """
 
+    def delete():
+        """
+        Deletes this field from the IContent containing it.
+        If a field cannot be deleted, it should be reset to its default value.
+        """
+        
 class ICollection(Interface):
     """
     The result of a search
@@ -130,26 +136,49 @@ class IStorage(Interface):
     This could be a relational, file system or zodb storage.
     """
 
-    def load(id):
+    def store(content):
         """
-        Load the content specified by id, return an IContent or
-        raise an exception from mortar.exceptions.
-        """
-        
-    def store(id,content):
-        """
-        Save the content specified by id and provided in the 'content'
-        parameter. The 'content' will provide IContent.
-        May raise exceptions from mortar.exceptions.
+        This should store the supplied content in the current
+        storage.
+        If the content is already contained within this storage, then
+        any changes made to it should be saved.
+
+        If this storage does not support changing of its content or if
+        the supplied content cannot be stored (eg: because it contains
+        fields that do not map to a relational table) then a
+        mortar.exceptions.NotSupported exception should be raised
+        giving appropriate details.
         """
 
+    def load(id):
+        """
+        This should load the content related to the supplied id.
+
+        If the content does not exist in this storage, a
+        mortar.exeptions.NotFound exception should be raised giving
+        appropriate details.
+        """
+
+class ISearch(Interface):
+    """
+    """
+
+    def search(query):
+        """
+        """
+        
+class IQueryAtom(Interface):
+    """
+    """
+    
 class IView(Interface):
     """
     A view control, for accumulating other controls
     """
 
     def __call__(self):
-        pass
+        """
+        """
 
 class IControl(Interface):
     """

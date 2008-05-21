@@ -11,16 +11,13 @@ def content():
 # bleugh
 import convertors
 
-## def search(*args,**kw):
-##     "returns an IResultSet, spec allows searching, sorting, etc"
-##     pass
+def search(*args,**kw):
+    "returns an IResultSet, spec allows searching, sorting, etc"
+    pass
 
-## def getById(id):
-##     "returns the IContent specified by the id"
-##     pass
+def get(id):
+    "returns the IContent specified by the id"
+    pass
 
-## def new(type):
-##     "return a new IContent"
-##     if not IContent.isImplementedBy(type):
-##         type = getById(type)
-##     return Content(type)
+def store(content):
+    "stores the supplied content object"
