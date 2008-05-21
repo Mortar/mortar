@@ -1,0 +1,19 @@
+Traversing Content
+
+  This document covers what happens when you traverse content by
+  getting a piece of content. The behaviour described below applies
+  equally to content obtained by a search, retrieving by id and
+  retrieving by reference.
+
+  ISecurity
+
+  IRegistrations
+
+  Both only apply to the traversal context of the current content
+  object:
+
+  >>> from mortar import get
+  >>> get('root')['someobjwithsecuritychanges']['someobjwithregistrations'].view()
+  >>> get('someotherroot')['someobjwithsecuritychanges']['someobjwithregistrations'].view()
+
+  (the views should be different)

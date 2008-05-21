@@ -207,6 +207,3 @@ class IFieldType(Interface):
     Not quite sure yet...
     """
     pass
-
-
-
