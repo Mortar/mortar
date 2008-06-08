@@ -136,7 +136,7 @@ class IStorage(Interface):
     This could be a relational, file system or zodb storage.
     """
 
-    def store(content):
+    def save(content):
         """
         This should store the supplied content in the current
         storage.
