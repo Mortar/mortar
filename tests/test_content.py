@@ -4,15 +4,17 @@
 
 import unittest
 
-from zope.interface.verify import verifyObject
+from common import ContentTests as Base
 
-class ContentTests(unittest.TestCase):
+class ContentTests(Base):
 
-    def test_interface(self):
-        from mortar.interfaces import IContent
+    # These tests are for the simple implementation
+    # of IContent
+    
+    def setUp(self):
         from mortar import content
-        verifyObject(IContent, content())
-
+        self.content = content()
+        
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(ContentTests),
