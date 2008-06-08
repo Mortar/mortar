@@ -1,0 +1,6 @@
+<content>
+  <field name="testfield">testvalue</field>
+  <field name="testxml">some <xml>things
+</xml> different.</field>
+</content>
+
