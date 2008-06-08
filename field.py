@@ -24,7 +24,7 @@ class Field:
     def get(self,as=None,default=marker):
         if self.value is marker:
             # xxx content type should figure in here
-            if self.default is marker:
+            if default is marker:
                 v = None
             else:
                 v = default
