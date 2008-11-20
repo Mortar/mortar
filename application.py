@@ -1,3 +1,5 @@
+from webob import Request, Response
+
 class Root:
     pass
 
@@ -18,3 +20,11 @@ def process_url(path):
     assert isinstance(view,unicode)
     return result.encode('utf-8')
     
+class Application:
+    def __call__(self, environ, start_response):
+        req = Request(environ)
+        resp = Response(
+            'Hello %s!' % req.params.get('name', 'World'))
+        return resp(environ, start_response)
+
+app = Application()
