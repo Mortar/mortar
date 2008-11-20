@@ -1,3 +1,6 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 from interfaces import IField,marker
 from types import text
 from zope.interface import implements
@@ -21,7 +24,7 @@ class Field:
             self.value
             )
     
-    def get(self,as=None,default=marker):
+    def get(self,type=None,default=marker):
         if self.value is marker:
             # xxx content type should figure in here
             if default is marker:
@@ -30,20 +33,20 @@ class Field:
                 v = default
         else:
             v = self.value
-        if as is not None:
-            v = as(v)
+        if type is not None:
+            v = type(v)
         return v
 
-    def set(self,value,as=None):
-        if as is not None:            
-            value = as(value)
+    def set(self,value,type=None):
+        if type is not None:            
+            value = type(value)
         self.value = value
             
-    def canSet(self):
+    def canSet(self,user=None):
         raise NotImplementedError 
         return True
 
-    def canGet(self):
+    def canGet(self,user=None):
         raise NotImplementedError
         return self.data.has_key(name)
 

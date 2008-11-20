@@ -1,6 +1,5 @@
 # Copyright (c) 2008 Simplistix Ltd
-#
-# All rights reserved.
+# See license.txt for license details.
 
 from  unittest import TestCase
 from zope.interface.verify import verifyObject

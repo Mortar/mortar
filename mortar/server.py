@@ -1,3 +1,6 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 from wsgiref.simple_server import make_server
 from mortar.application import app
 httpd = make_server('', 8000, app)

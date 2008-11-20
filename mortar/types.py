@@ -1,3 +1,6 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 from interfaces import IFieldType
 
 class date(IFieldType):

@@ -21,7 +21,7 @@ The Content Interface
   more expressive:
 
   >>> from mortar import types
-  >>> fred['date of birth'].set('1965/11/01',as=types.date)
+  >>> fred['date of birth'].set('1965/11/01',type=types.date)
   
   We can now see that Fred's date of birth has been stored as a date:
 
@@ -31,7 +31,7 @@ The Content Interface
   If we wanted his date of birth as text, we could use a similarly
   more expressive version of get:
 
-  >>> fred['date of birth'].get(as=types.text)
+  >>> fred['date of birth'].get(type=types.text)
   u'1965/11/01'
 
   However, since we often want to get field values as text, fields can

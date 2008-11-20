@@ -1,3 +1,6 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 from field import Field
 from interfaces import IContent,IField,IFieldType
 from types import reference

@@ -1,0 +1,23 @@
+======
+Mortar
+======
+
+Mortar will be an environment that insulates the application developer
+from the implementation details of storage, retrieval and searching of
+content. 
+
+This will allow applications to be developed in one environment, say
+on a simple local Python+SQLite setup, and then deploy to another
+environment, say Google App Engine or a clustered array of Amazon EC2
+instances, with no changes to application code.
+
+This architecture should also provide a seamless environment for
+application developers to work with a disparate array of data sources.
+
+A secondary aim is to allow DBAs and system administrators to optimise
+the performance of applications without modifying any application
+code.
+
+However, for now, it is in the very early stages of development and
+should probably be avoided unless you simply want to see how it's
+shaping up or you want to actively participate in development.

@@ -1,3 +1,6 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 class NotPossible(Exception):
     """
     Base class for things that didn't work

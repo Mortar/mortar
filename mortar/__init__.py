@@ -1,6 +1,5 @@
 # Copyright (c) 2007-2008 Simplistix Ltd
-#
-# All rights reserved.
+# See license.txt for license details.
 
 from content import Content
 from interfaces import IContent
