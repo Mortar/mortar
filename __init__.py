@@ -11,7 +11,7 @@ def content():
 # bleugh
 import convertors
 
-def search(*args,**kw):
+def search(query,sort=None):
     "returns an IResultSet, spec allows searching, sorting, etc"
     pass
 

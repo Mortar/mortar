@@ -4,7 +4,7 @@ marker = object()
 
 class IContent(Interface):
     """
-    All content must implement this schema.
+    All content must implement this interface.
     Security should be checked for each operation.
     """
 
@@ -77,13 +77,13 @@ class IField(Interface):
         stored. Any type supplied must implement IFieldType.
         """
 
-    def canSet():
+    def canSet(user=None):
         """
         returns boolean saying whether this field can be set by the current
         user.
         """
 
-    def canGet():
+    def canGet(user=None):
         """
         returns boolean saying whether this field can be accessed by the current
         user.
