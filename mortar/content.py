@@ -16,29 +16,25 @@ class Content:
         self.data = {}
 
     def __getitem__(self,name):
-        if not self.data.has_key(name):
-            self.data[name] = Field(self,name)
-        return self.data[name]
+        return Field(self,name)
 
     def __setitem__(self,name,value):
-        field = Field(self,name)
         if IField.providedBy(value):
-            field.set(value.get())
+            value = value.get()
         else:
-            field.set(IFieldType(value))
-        self.data[name]=field
+            value = IFieldType(value)
+        self.data[name]=value
 
     def __delitem__(self,name):
         del self.data[name]
         
     @property
     def names(self):
-        return self.data.keys()
+        return sorted(self.data.keys())
 
     @property
     def type(self):
         return None
-        raise NotImplementedError
 
     def view(self,name=None):
         raise NotImplementedError

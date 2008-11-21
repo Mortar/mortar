@@ -29,7 +29,8 @@ class IContent(Interface):
 
     names = Attribute(
        """
-       The names of the fields currently available in this IContent
+       The names of the fields currently available in this IContent.
+       This sequence will always be alphabetically ordered.
        """
        )
 
@@ -43,7 +44,7 @@ class IContent(Interface):
         """
         Set a field of the specified name.
         The value may implement IField or be of a type for which a
-        converter to IField has been registered.  
+        converter to IFieldType has been registered.  
         """
 
     def view(name=None):

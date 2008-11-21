@@ -7,8 +7,6 @@ from zope.interface import implements
 
 class Field:
 
-    value = None
-    
     implements(IField)
 
     def __init__(self,content,name):
@@ -16,19 +14,18 @@ class Field:
         self.name = name
     
     def __unicode__(self):
-        return text(self.value)
+        return text(self.content.data.get(self.name))
 
     def __repr__(self):
         return '<Field %r containing %r>' % (
             self.name,
-            self.value
+            self.content.data.get(self.name)
             )
     
     def get(self,default=None,type=None):
-        if self.value is None:
+        v = self.content.data.get(self.name)
+        if v is None:
             v = default
-        else:
-            v = self.value
         if v is None:
             return v
         if type is not None:
@@ -36,11 +33,11 @@ class Field:
         return v
 
     def set(self,value,type=IFieldType):
-        self.value = type(value)
+        self.content[self.name]=type(value)
             
     @property
     def type(self):
-        return type(self.value)
+        return type(self.content.data.get(self.name))
     
     def canSet(self,user=None):
         raise NotImplementedError 

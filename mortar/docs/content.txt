@@ -57,9 +57,11 @@ The Content Interface
   We can also ask each field what type of data it contains:
 
   >>> fred['name'].type
-  <mortar.types.  
+  <InterfaceClass mortar.types.text>
   >>> fred['date of birth'].type
+  <InterfaceClass mortar.types.date>
   >>> fred['age'].type
+  <InterfaceClass mortar.types.number>
 
   Now that we have a date of birth, we don't need an age anymore:
 
@@ -108,15 +110,15 @@ The Content Interface
   looking at the 'names' attribute of that content:
 
   >>> fred.names
-  ['last name', 'date of birth', 'first name', 'address']
+  ['address', 'date of birth', 'first name', 'last name']
 
   We can use this information to, for example, display all the fields
   in a piece of content:
 
   >>> for name in fred.names:
   ...   print name,':',unicode(fred[name])
-  last name : Jones
+  address : Reference to None
   date of birth : 1965/11/01
   first name : Fred
-  address : Reference to None
+  last name : Jones
 

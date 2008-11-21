@@ -18,6 +18,15 @@ class ContentTests(unittest.TestCase):
         from mortar.interfaces import IContent
         verifyObject(IContent, self.content)
 
+    def test_names_empty(self):
+        self.assertEqual(self.content.names,[])
+
+    def test_names_sorting(self):
+        self.content['2']=2
+        self.content['1']=1
+        self.content['3']=3
+        self.assertEqual(self.content.names,['1','2','3'])
+        
     def test_set(self):
         # - with value
         # - with as
@@ -42,4 +51,6 @@ class ContentTests(unittest.TestCase):
     def test_delete(self):
         pass
     
+    def test_delete_not_there(self):
+        pass
     
