@@ -28,9 +28,23 @@ The Content Interface
   >>> fred['date of birth'].get()
   datetime.date(1965, 11, 1)
 
+  The date parsing used is fairly flexible:
+
+  >>> fred['date of birth'].set('13th June 1978 20:01',type=types.datetime)
+  >>> fred['date of birth'].get()
+  datetime.datetime(1978, 6, 13, 20, 1)
+
+  But, for the time being, be aware that ambigous dates will be parsed
+  as if they were in non-american format:
+
+  >>> fred['date of birth'].set('4/5/08',type=types.date)
+  >>> fred['date of birth'].get()
+  datetime.date(2008, 5, 4)
+
   If we wanted his date of birth as text, we could use a similarly
   more expressive version of get:
 
+  >>> fred['date of birth'].set('1965/11/01',type=types.date)
   >>> fred['date of birth'].get(type=types.text)
   u'1965/11/01'
 
@@ -39,6 +53,13 @@ The Content Interface
 
   >>> unicode(fred['date of birth'])
   u'1965/11/01'
+
+  We can also ask each field what type of data it contains:
+
+  >>> fred['name'].type
+  <mortar.types.  
+  >>> fred['date of birth'].type
+  >>> fred['age'].type
 
   Now that we have a date of birth, we don't need an age anymore:
 
@@ -55,9 +76,9 @@ The Content Interface
 
   >>> fred['name'].set('rubbish')
   >>> fred['name']
-  <Field 'name' containing 'rubbish'>
+  <Field 'name' containing u'rubbish'>
   >>> fred['first name']
-  <Field 'first name' containing 'Fred'>
+  <Field 'first name' containing u'Fred'>
 
   In this case, however, we don't need the 'name' field anymore once
   we've stored Fred's last name:  

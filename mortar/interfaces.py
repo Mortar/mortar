@@ -24,7 +24,8 @@ class IContent(Interface):
     type = Attribute(
        """
        The type of this IContent. 
-       """)
+       """
+       )
 
     names = Attribute(
        """
@@ -63,7 +64,7 @@ class IContent(Interface):
 class IField(Interface):
     "A single field of a piece of content"
 
-    def get(as=None,default=marker):
+    def get(default=marker,type=None):
         """
         Return the value of the field in the type specified.
         If the IContent does not have a value, return the default
@@ -73,12 +74,19 @@ class IField(Interface):
         The type specified must implement IFieldType.
         """
 
-    def set(value,as=None):
+    def set(value,type=None):
         """
-        Set this field to the supplied value. If a type is supplied,
+        Set this field to the supplied value. The value stored will be
+        converted to IIf a type is supplied,
         the value will be converted to this type before being
         stored. Any type supplied must implement IFieldType.
         """
+
+    type = Attribute(
+       """
+       The IFieldType of the data in this field. 
+       """
+       )
 
     def canSet(user=None):
         """
@@ -98,6 +106,19 @@ class IField(Interface):
         If a field cannot be deleted, it should be reset to its default value.
         """
         
+class IFieldType(Interface):
+    """
+    A marker interface indicating that this is a 'mortar-native'
+    value.
+
+    Subclasses of this interface are used to indicate particular types
+    of value. The full list of these is provided in mortar.types.
+
+    Registering adapters to these interfaces will allow you to set a
+    field value to any object where an adapter to the appropriate
+    interface is provided. The adapter does the conversion.
+    """
+    
 class ICollection(Interface):
     """
     The result of a search
@@ -205,8 +226,3 @@ class IControl(Interface):
         """
         """
 
-class IFieldType(Interface):
-    """
-    Not quite sure yet...
-    """
-    pass

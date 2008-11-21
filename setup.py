@@ -28,6 +28,7 @@ setup(
     'zope.interface',
     'zope.component',
     'lxml',
+    'python-dateutil',
     )
     )
 

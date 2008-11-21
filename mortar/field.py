@@ -1,13 +1,13 @@
 # Copyright (c) 2008 Simplistix Ltd
 # See license.txt for license details.
 
-from interfaces import IField,marker
-from types import text
+from interfaces import IField,IFieldType
+from types import text,type
 from zope.interface import implements
 
 class Field:
 
-    value = marker
+    value = None
     
     implements(IField)
 
@@ -24,24 +24,24 @@ class Field:
             self.value
             )
     
-    def get(self,type=None,default=marker):
-        if self.value is marker:
-            # xxx content type should figure in here
-            if default is marker:
-                v = None
-            else:
-                v = default
+    def get(self,default=None,type=None):
+        if self.value is None:
+            v = default
         else:
             v = self.value
+        if v is None:
+            return v
         if type is not None:
-            v = type(v)
+            return type(v)
         return v
 
-    def set(self,value,type=None):
-        if type is not None:            
-            value = type(value)
-        self.value = value
+    def set(self,value,type=IFieldType):
+        self.value = type(value)
             
+    @property
+    def type(self):
+        return type(self.value)
+    
     def canSet(self,user=None):
         raise NotImplementedError 
         return True
