@@ -8,14 +8,14 @@ name = 'mortar'
 package_dir = os.path.join(os.path.dirname(__file__),name)
 
 setup(
-    name='mortar',
+    name=name,
     version=file(os.path.join(package_dir,'version.txt')).read().strip(),
     author='Chris Withers',
     author_email='chris@simplistix.co.uk',
     license='MIT',
     description="An implementation independent content environment.",
     long_description=open(os.path.join(package_dir,'docs','description.txt')).read(),
-    # url='http://www.simplistix.co.uk/software/python/mortar',
+    url='www.mortar.org',
     classifiers=[
     'Development Status :: 2 - Pre-Alpha',
     'Intended Audience :: Developers',
@@ -27,8 +27,9 @@ setup(
     install_requires=(
     'zope.interface',
     'zope.component',
-    'lxml',
+    'lxml < 1.9',
     'python-dateutil',
+    'resolve',
     )
     )
 
