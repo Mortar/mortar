@@ -1,7 +1,11 @@
+# Copyright (c) 2008 Simplistix Ltd
+# See license.txt for license details.
+
 import unittest
 
-from mortar import types
 from datetime import datetime, date, time
+from mortar import types
+from fixtures import check
 
 class TestType(unittest.TestCase):
 
@@ -10,9 +14,9 @@ class TestType(unittest.TestCase):
     mapping = (
         (None                    ,None),
         # should never have an empty sequence returned
-        (()                      ,IndexError()),
+        (()                      ,IndexError('tuple index out of range')),
         # should never have a None sequence
-        ((None,)                 ,KeyError()), 
+        ((None,)                 ,KeyError(type(None))), 
         (datetime(2008,1,1,20,00),types.datetime),
         # the type function is happy with lists or tuples
         ((datetime(2008,1,1,20),),types.datetimes),
@@ -37,17 +41,7 @@ class TestType(unittest.TestCase):
     def test_type(self):
         errors = []
         for o,e in self.mapping:
-            try:
-                a = types.type(o)
-            except Exception,ex:
-                a = ex
-            message = 'Expected %r to be of type %r, but was %r' % (o,e,a)
-            if isinstance(e,Exception):
-                if a.__class__ is not e.__class__:
-                    errors.append(message)
-            else:
-                if a is not e:
-                    errors.append(message)
+            check(types.type,o,e,errors)
         if errors:
             self.fail('Type mapping not as expected:\n'+('\n'.join(errors)))
 
