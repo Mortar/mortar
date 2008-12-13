@@ -6,7 +6,7 @@ import unittest
 
 from fixtures import identity,check
 from mortar import types
-from mortar.interfaces import IFieldType
+from mortar.interfaces import IFieldType,empty
 
 class TestConvertors(unittest.TestCase):
 
@@ -46,22 +46,6 @@ class TestConvertors(unittest.TestCase):
         ],
         types.binaries: [
         ],
-        # this is a special type that means "give me whatever is stored but
-        # as a sequence"
-        types.sequence: [
-            ('some text'                      ,(u'some text',)),
-            (u'unicode'                       ,(u'unicode',)),
-            (1                                ,(1,)),
-            (1.0                              ,(1.0,)),
-            (datetime.date(2008,1,1)          ,(datetime.date(2008,1,1),)),
-            ((datetime.date(2008,1,20),)      ,identity),
-            ((datetime.datetime(2008,1,1,20),),identity),
-            ([datetime.time(20,00)]           ,identity),
-            ([0]                              ,identity),
-            ([0.0]                            ,identity),
-            ([0,'']                           ,identity),
-            ([u'text']                        ,identity),
-        ]
     }
     
     def test_convertors(self):
@@ -77,9 +61,17 @@ class TestConversion(unittest.TestCase):
 
     # expected -> actual, tuples as lists can't be hashed
     mapping = [
-        ('some text',u'some text'),
-        (u'some text',identity),
-        (1.0,identity),
+        ('some text'    ,u'some text'),
+        (u'some text'   ,identity),
+        (1.0,identity)  ,
+        (['some text']  ,[u'some text']),
+        (('some text',) ,(u'some text',)),
+        (()             ,empty),
+        ([]             ,empty),
+        ([u'some text'] ,identity),
+        ((u'some text',),identity),
+        ((1,'x'),       TypeError("Sequences must be of one type, could not convert 'x' to <InterfaceClass mortar.types.number>")),
+        ([1,'x'],       TypeError("Sequences must be of one type, could not convert 'x' to <InterfaceClass mortar.types.number>")),
         ]
     
     def test_conversion(self):

@@ -107,6 +107,8 @@ class IField(Interface):
         If a field cannot be deleted, it should be reset to its default value.
         """
         
+empty = object()
+
 class IFieldType(Interface):
     """
     A marker interface indicating that this is a 'mortar-native'
@@ -119,6 +121,14 @@ class IFieldType(Interface):
     field value to any object where an adapter to the appropriate
     interface is provided. The adapter does the conversion.
     """
+
+    def __call__(self,*args,**kw):
+        # sadly doesn't get called
+        raise NotImplementedError
+        r = Interface.__call__(*args,**kw)
+        if r is empty:
+            return None
+        return r
     
 class ICollection(Interface):
     """

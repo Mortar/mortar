@@ -3,6 +3,7 @@
 
 import unittest
 
+from mortar import types
 from zope.interface.verify import verifyObject
 
 class ContentTests(unittest.TestCase):
@@ -26,6 +27,14 @@ class ContentTests(unittest.TestCase):
         self.content['1']=1
         self.content['3']=3
         self.assertEqual(self.content.names,['1','2','3'])
+        
+    def test_set_with_empty(self):
+        self.content['x']=()
+        self.assertEqual(self.content['x'].get(),None)
+        
+    def test_getas_after_empty_set(self):
+        self.content['x']=()
+        self.assertEqual(self.content['x'].get(type=types.text),None)
         
     def test_set(self):
         # - with value

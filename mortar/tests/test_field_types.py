@@ -5,6 +5,7 @@ import unittest
 
 from datetime import datetime, date, time
 from mortar import types
+from mortar.interfaces import empty
 from fixtures import check
 
 class TestType(unittest.TestCase):
@@ -35,6 +36,7 @@ class TestType(unittest.TestCase):
         # XXX reference(s)?
         ('a string'              ,types.binary),
         (['a string']            ,types.binaries),
+        (empty                   ,None)
         )
 
     def test_type(self):

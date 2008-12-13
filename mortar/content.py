@@ -2,7 +2,7 @@
 # See license.txt for license details.
 
 from field import Field
-from interfaces import IContent,IField,IFieldType
+from interfaces import IContent,IField,IFieldType,empty
 from types import reference
 from zope.interface import implements
 
@@ -21,8 +21,12 @@ class Content:
     def __setitem__(self,name,value):
         if IField.providedBy(value):
             value = value.get()
+        elif value is empty:
+            value = None
         else:
             value = IFieldType(value)
+            if value is empty:
+                value = None
         self.data[name]=value
 
     def __delitem__(self,name):

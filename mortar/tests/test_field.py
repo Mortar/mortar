@@ -65,8 +65,11 @@ class TestSet(unittest.TestCase):
     def test_default_non_string(self):
         self.check(1,types.number,1)
 
-    def test_coerce_to_sequence(self):
-        self.check(('value',),types.texts,'value',type=types.sequence)
+    def test_coerce_to_texts(self):
+        self.check(('value',),types.texts,u'value',type=types.texts)
+        
+    def test_coerce_to_None(self):
+        self.check(None,None,())
         
 class TestAdd(TestSet):
 

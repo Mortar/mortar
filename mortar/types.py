@@ -3,7 +3,7 @@
 
 import datetime as python_datetime
 
-from interfaces import IFieldType
+from interfaces import IFieldType,empty
 
 class sequence(IFieldType):
     pass
@@ -62,6 +62,7 @@ class_to_type_singular = {
     float:number,
     unicode:text,
     str:binary,
+    empty:None,
     }
 
 class_to_type_plural = {
@@ -75,6 +76,8 @@ class_to_type_plural = {
     }
 
 def type(value):
+    if value is empty:
+        return None
     if isinstance(value,(list,tuple)):
         value = value[0]
         mapping = class_to_type_plural
