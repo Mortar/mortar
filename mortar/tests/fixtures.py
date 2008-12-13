@@ -18,7 +18,7 @@ def check(callable,arg,expected,errors):
         callable,arg,expected,actual
         )
     if expected is identity:
-        if actual is not expected:
+        if actual is not arg:
             errors.append(base%('to be'))
     else:
         if actual!=expected:
