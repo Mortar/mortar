@@ -9,8 +9,7 @@ from fixtures import check
 
 class TestType(unittest.TestCase):
 
-    # object -> type, we use a tuple of tuples as lists are unhashable,
-    # so we can't use a dict
+    # object -> type, we use a tuple of tuples as dicts are unhashable,
     mapping = (
         (None                    ,None),
         # should never have an empty sequence returned
