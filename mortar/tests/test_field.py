@@ -4,7 +4,7 @@
 import unittest
 
 from mortar import content,types
-from testfixtures import should_raise
+from testfixtures import should_raise,compare
 from zope.interface.verify import verifyObject
 
 class FieldTests(unittest.TestCase):
@@ -60,13 +60,13 @@ class TestSet(unittest.TestCase):
         self.assertEqual(e_type,self.field.type)
                          
     def test_default(self):
-        self.check('value',types.text,'value')
+        self.check(u'value',types.text,'value')
 
     def test_default_non_string(self):
         self.check(1,types.number,1)
 
     def test_coerce_to_texts(self):
-        self.check(('value',),types.texts,u'value',type=types.texts)
+        self.check((u'value',),types.texts,u'value',type=types.texts)
         
     def test_coerce_to_None(self):
         self.check(None,None,())
@@ -75,15 +75,45 @@ class TestAdd(TestSet):
 
     method = 'add'
     
+    def test_default(self):
+        self.check([u'value'],types.texts,u'value')
+
+    def test_default_non_string(self):
+        self.check([1],types.numbers,1)
+
+    def test_coerce_to_texts(self):
+        self.check([u'value'],types.texts,u'value',type=types.texts)
+        
     def test_add_to_existing(self):
-        pass
+        self.field.set(u'test1')
+        self.field.add(u'test2')
+        compare(self.field.get(),[u'test1',u'test2'])
 
     def test_add_wrong_type_attempt(self):
-        pass
+        self.field.set('test1')
+        should_raise(self.field.add,TypeError(
+            "Can't add number to texts"
+            ))(1)
+
+    def test_add_wrong_type_sequence_attempt(self):
+        self.field.set('test1')
+        should_raise(self.field.add,TypeError(
+            "Can't add numbers to texts"
+            ))((1,))
+
+    def test_add_list_to_existing(self):
+        self.field.set(u'test1')
+        self.field.add([u'test2'])
+        compare(self.field.get(),[u'test1',u'test2'])
+
+    def test_add_tuple_to_existing(self):
+        self.field.set(u'test1')
+        self.field.add((u'test2',))
+        compare(self.field.get(),[u'test1',u'test2'])
 
 def test_suite():
     return unittest.TestSuite((
         unittest.makeSuite(FieldTests),
         unittest.makeSuite(TestSet),
-        # unittest.makeSuite(TestAdd),
+        unittest.makeSuite(TestAdd),
         ))
