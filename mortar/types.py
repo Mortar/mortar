@@ -5,40 +5,46 @@ import datetime as python_datetime
 
 from interfaces import IFieldType
 
-class datetime(IFieldType):
+class sequence(IFieldType):
     pass
 
-class datetimes:
+class not_sequence(IFieldType):
     pass
 
-class date(IFieldType):
+class datetime(not_sequence):
     pass
 
-class dates:
+class datetimes(sequence):
+    pass
+
+class date(not_sequence):
+    pass
+
+class dates(sequence):
     pass
 
 class time:
     pass
 
-class times:
+class times(sequence):
     pass
 
-class number(IFieldType):
+class number(not_sequence):
     pass
 
-class numbers:
+class numbers(sequence):
     pass
 
-class text(IFieldType):
+class text(not_sequence):
     pass
 
-class texts:
+class texts(sequence):
     pass
 
-class reference(IFieldType):
+class reference(not_sequence):
     pass
 
-class references:
+class references(sequence):
     pass
 
 class binary:

@@ -4,6 +4,7 @@
 import unittest
 
 from mortar import content,types
+from testfixtures import should_raise
 from zope.interface.verify import verifyObject
 
 class FieldTests(unittest.TestCase):
@@ -35,10 +36,15 @@ class FieldTests(unittest.TestCase):
     
     def test_delete(self):
         self.assertEqual(self.content.names,[])
-        pass
+        self.field.set('x')
+        self.assertEqual(self.content.names,['test'])
+        self.field.delete()
+        self.assertEqual(self.content.names,[])
     
     def test_delete_not_there(self):
-        pass
+        self.assertEqual(self.content.names,[])
+        should_raise(self.field.delete,KeyError('test'))()
+        self.assertEqual(self.content.names,[])
 
 class TestSet(unittest.TestCase):
 
@@ -59,24 +65,9 @@ class TestSet(unittest.TestCase):
     def test_default_non_string(self):
         self.check(1,types.number,1)
 
-    def test_string(self):
-        pass
-
-    def test_string_non_string(self):
-        pass
-
-    def test_date(self):
-        pass
-
-    def test_number(self):
-        pass
-
-    def test_number_from_string(self):
-        pass
-
-    def test_path(self):
-        pass
-
+    def test_coerce_to_sequence(self):
+        self.check(('value',),types.texts,'value',type=types.sequence)
+        
 class TestAdd(TestSet):
 
     method = 'add'
