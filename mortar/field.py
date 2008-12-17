@@ -26,8 +26,6 @@ class Field:
         v = self.content.data.get(self.name)
         if v is None:
             v = default
-        if v is None:
-            return v
         if type is not None:
             return type(v)
         return v

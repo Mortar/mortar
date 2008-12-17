@@ -34,7 +34,7 @@ class ContentTests(unittest.TestCase):
         
     def test_getas_after_empty_set(self):
         self.content['x']=()
-        self.assertEqual(self.content['x'].get(type=types.text),None)
+        self.assertEqual(self.content['x'].get(type=types.text),'')
         
     def test_set(self):
         # - with value

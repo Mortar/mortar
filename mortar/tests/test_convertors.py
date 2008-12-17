@@ -39,6 +39,7 @@ class TestConvertors(unittest.TestCase):
            (1.0         ,u'1.0'),
            (datetime.datetime(2008, 1, 2, 0, 0),'2008/01/02 00:00:00'),
            (datetime.date(2008, 1, 2)          ,'2008/01/02'),
+           (None                               ,'')
         ],
         types.texts: [
            (datetime.datetime(2008, 1, 2, 0, 0)   ,(u'2008/01/02 00:00:00',)),
@@ -50,6 +51,7 @@ class TestConvertors(unittest.TestCase):
            (u'text'                            ,(u'text',)),
            (1                                  ,(u'1',)),
            (1.0                                ,(u'1.0',)),
+           (None                               ,[])
         ],
         types.reference: [
         ],

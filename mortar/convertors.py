@@ -80,7 +80,13 @@ def sequence_to_sequence(s):
             ))
     return s
         
-    
+
+def none_to_text(v):
+    return ''
+
+def none_to_sequence(v):
+    return []
+
 # NB: order matters here :-S
 provideAdapter(str_to_date,(str,),date_type)
 provideAdapter(str_to_datetime,(str,),datetime_type)
@@ -95,3 +101,5 @@ provideAdapter(to_text,(str,),text_type)
 provideAdapter(to_text,(int,),text_type)
 provideAdapter(to_text,(float,),text_type)
 provideAdapter(reference_to_text,(reference,),text_type)
+provideAdapter(none_to_text,(type(None),),text_type)
+provideAdapter(none_to_sequence,(type(None),),texts)
