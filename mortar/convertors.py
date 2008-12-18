@@ -29,13 +29,18 @@ def to_text(str):
     
 def str_to_datetime(str):
     # should be configurable
-    return parse(str,dayfirst=True)
+    try:
+        return parse(str,dayfirst=True)
+    except ValueError:
+        return None
     
 def str_to_date(str):
-    return str_to_datetime(str).date()
+    dt = str_to_datetime(str)
+    return dt and dt.date()
 
 def str_to_time(str):
-    return str_to_datetime(str).time()
+    dt = str_to_datetime(str)
+    return dt and dt.time()
     
 def date_to_text(date):
     # bleugh

@@ -16,10 +16,13 @@ class TestConvertors(unittest.TestCase):
             ('2008/02/01'                       ,datetime.datetime(2008, 2, 1, 0, 0)),
             (identity                           ,TypeError('Could not adapt',identity,types.datetime)),
             (datetime.datetime(2008, 2, 1, 0, 0),identity),
+            ('junk'                             ,TypeError('Could not adapt','junk',types.datetime)),
         ],
         types.datetimes: [
         ],
         types.date: [
+            ('2008/02/01'                       ,datetime.date(2008, 2, 1)),
+            ('junk'                             ,TypeError('Could not adapt','junk',types.date)),
         ],
         types.dates: [
         ],
