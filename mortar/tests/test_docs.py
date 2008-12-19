@@ -12,6 +12,8 @@ def test_suite():
         # BODGE!
         if os.path.split(path)[-1] in ('traversing.txt',):
             continue
+        # work around zope.testing bug
+        path = '..'+path.split('..')[1]
         suite.addTest(
             DocFileSuite(path, optionflags=REPORT_NDIFF|ELLIPSIS)
             )
