@@ -5,7 +5,7 @@
 Stuff to allow building of complicated search specs.
 """
 
-clas Operator:
+class Operator:
 
     def __init__(self,*args):
         self.args = args

@@ -1,7 +1,8 @@
 # Copyright (c) 2008 Simplistix Ltd
 # See license.txt for license details.
 
-from webob import Request, Response
+# NB: not declared as a dependency yet
+# from webob import Request, Response
 
 class Root:
     pass
