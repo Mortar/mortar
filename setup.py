@@ -15,7 +15,7 @@ setup(
     license='MIT',
     description="An implementation independent content environment.",
     long_description=open(os.path.join(package_dir,'docs','description.txt')).read(),
-    url='www.mortar.org',
+    url='http://www.mortar.org',
     classifiers=[
     'Development Status :: 2 - Pre-Alpha',
     'Intended Audience :: Developers',
