@@ -27,7 +27,7 @@ setup(
     install_requires=(
     'zope.interface',
     'zope.component',
-    'lxml < 1.9',
+    'lxml',
     'python-dateutil',
     )
     )
