@@ -29,7 +29,13 @@ setup(
     'zope.component',
     'lxml',
     'python-dateutil',
-    )
+    ),
+    extras_require=dict(
+           test=[
+            'mock',
+            'testfixtures >= 1.5.3',
+            ],
+           )
     )
 
 # to build and upload the eggs, do:
