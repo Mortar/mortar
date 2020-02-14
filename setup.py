@@ -1,48 +1,40 @@
-# Copyright (c) 2008 Simplistix Ltd
 # See license.txt for license details.
+# Copyright (c) 2020, Chris Withers
 
 import os
+
 from setuptools import setup, find_packages
 
-name = 'mortar'
-package_dir = os.path.join(os.path.dirname(__file__),name)
+base_dir = os.path.dirname(__file__)
 
 setup(
-    name=name,
-    version=file(os.path.join(package_dir,'version.txt')).read().strip(),
+    name='mortar',
+    version='0.2.0.dev0',
     author='Chris Withers',
-    author_email='chris@simplistix.co.uk',
+    author_email='chris@withers.org',
     license='MIT',
-    description="An implementation independent content environment.",
-    long_description=open(os.path.join(package_dir,'docs','description.txt')).read(),
-    url='http://www.mortar.org',
+    description=(
+        "A dependency injection based web application server framework."
+    ),
+    long_description=open('README.rst').read(),
+    url='https://github.com/mortar/mortar',
     classifiers=[
-    'Development Status :: 2 - Pre-Alpha',
-    'Intended Audience :: Developers',
-    'License :: OSI Approved :: MIT License',
-    ],    
-    packages=find_packages(),
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+    ],
+    packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     include_package_data=True,
-    install_requires=(
-    'zope.interface',
-    'zope.component',
-    'lxml',
-    'python-dateutil',
-    ),
     extras_require=dict(
-           test=[
-            'mock',
-            'testfixtures >= 1.5.3',
-            ],
-           )
-    )
-
-# to build and upload the eggs, do:
-# python setup.py sdist bdist_egg register upload
-# ...or...
-#  bin/buildout setup setup.py sdist bdist_egg register upload
-# ...on a unix box!
-
-# To check how things will show on pypi, install docutils and then:
-# bin/buildout -q setup setup.py --long-description | rst2html.py --link-stylesheet --stylesheet=http://www.python.org/styles/styles.css > dist/desc.html
+        test=[
+            'pytest',
+            'pytest-cov',
+            'sybil',
+            'testfixtures',
+        ],
+        build=['sphinx', 'sphinx-rtd-theme', 'setuptools-git', 'twine', 'wheel']
+    ),
+    options={'bdist_wheel': {'universal': True}},
+)

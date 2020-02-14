@@ -1,5 +1,4 @@
-Copyright (c) 2004-2008 Simplistix Ltd
-Copyright (c) 2001-2003 New Information Paradigms Ltd
+Copyright (c) 2020, Chris Withers
 
 Permission is hereby granted, free of charge, to any person 
 obtaining a copy of this software and associated documentation 
