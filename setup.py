@@ -7,6 +7,19 @@ from setuptools import setup, find_packages
 
 base_dir = os.path.dirname(__file__)
 
+defaults_require = [
+    'configurator',
+    'orjson',
+    'pydantic',
+]
+
+test_require = defaults_require + [
+    'pytest',
+    'pytest-cov',
+    'sybil',
+    'testfixtures',
+]
+
 setup(
     name='mortar',
     version='0.2.0.dev0',
@@ -27,13 +40,20 @@ setup(
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     include_package_data=True,
+    python_requires='>=3.6',
+    install_requires=[
+        'starlette >= 0.13.1',
+        'mush >= 3.0.0a1',
+    ],
     extras_require=dict(
-        test=[
-            'pytest',
-            'pytest-cov',
-            'sybil',
-            'testfixtures',
-        ],
-        build=['sphinx', 'sphinx-rtd-theme', 'setuptools-git', 'twine', 'wheel']
+        defaults=defaults_require,
+        test=test_require,
+        build=[
+            'sphinx',
+            'sphinx-rtd-theme',
+            'setuptools-git',
+            'twine',
+            'wheel'
+        ]
     ),
 )
