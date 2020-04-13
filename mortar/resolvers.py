@@ -17,9 +17,10 @@ class FromRequest(Requirement):
 
 
 def requirement_modifier(requirement):
-    if requirement.__class__ is Requirement:
+    if type(requirement) is Requirement:
         if requirement.type in (str, int, float, None):
-            requirement.__class__ = FromRequest
+            type_ = FromRequest
         else:
-            requirement.__class__ = Value
+            type_ = Value
+        requirement = type_.make_from(requirement)
     return requirement
