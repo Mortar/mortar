@@ -2,6 +2,8 @@ from functools import partial
 from typing import Callable, Sequence, List, Dict, Union, Type
 
 from mush.asyncio import Context, Runner
+from mush.declarations import returns_nothing
+from mush.typing import Requires
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
 from starlette.requests import Request
@@ -20,20 +22,28 @@ class Route:
             *,
             methods: List[str] = None,
             name: str = None,
-            requires: Sequence[Callable] = ()
+            tweens: Sequence[Callable] = (),
+            requires: Requires = None,
     ):
         self.path: str = path
         self.endpoint: Callable = endpoint
         self.methods: List[str] = methods
         self.name: str = name
-        self.requires: Sequence[Callable] = requires
+        self.tweens: List[Callable] = list(tweens)
+        self.requires: Requires = requires
 
 
 class RouteHandler:
 
-    def __init__(self, context: Context, endpoint: Callable, *requires: Sequence[Callable]):
+    def __init__(self,
+                 context: Context,
+                 endpoint: Callable,
+                 *tweens: Sequence[Callable],
+                 requires: Requires = None):
         self.context = context
-        self.runner = Runner(*requires, requirement_modifier=requirement_modifier)
+        self.runner = Runner(*tweens, requirement_modifier=requirement_modifier)
+        if requires:
+            self.runner.add(lambda *args: None, requires, returns_nothing)
         self.runner.add(endpoint)
 
     async def __call__(self, request: Request) -> JSONResponse:
@@ -61,7 +71,7 @@ class Mortar:
     def __init__(self,
                  lifespan: Sequence[Callable] = (),
                  middleware: Sequence[Middleware] = (),
-                 requires: Sequence[Callable] = (),
+                 tweens: Sequence[Callable] = (),
                  routes: Sequence[Route] = None,
                  exception_handlers: Dict[Union[int, Type[Exception]], Callable] = None,
                  debug: bool = False):
@@ -70,7 +80,7 @@ class Mortar:
         if lifespan:
             self.middleware.append(Middleware(LifecycleMiddleware, lifespan=lifespan))
         self.middleware.extend(middleware)
-        self.requires = requires
+        self.tweens = tweens
         self.routes = routes
         self.exception_handlers = exception_handlers
         self.debug = debug
@@ -86,7 +96,10 @@ class Mortar:
             starlette_routes.append(StarletteRoute(
                 route.path,
                 RouteHandler(
-                    self.context, route.endpoint, *self.requires, *route.requires
+                    self.context,
+                    route.endpoint,
+                    *self.tweens, *route.tweens,
+                    requires=route.requires
                 ).__call__,
                 methods=route.methods,
                 name=route.name

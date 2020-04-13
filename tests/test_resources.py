@@ -1,7 +1,7 @@
-from mush import Context
+from mush import Context, ContextError
 from starlette.requests import Request
 from starlette.testclient import TestClient
-from testfixtures import compare
+from testfixtures import compare, ShouldRaise
 
 from mortar import Mortar, Route
 
@@ -30,6 +30,40 @@ def test_synchronous_handler_gets_synchronous_context():
     with TestClient(app) as client:
         response = client.get("/?count=1")
         compare(response.json(), expected={'count': '1'})
+
+
+def test_route_requires_singular():
+
+    async def root(context: Context):
+        return {k: v for (k, v) in context._store.items() if k is not Request}
+
+    mortar = Mortar(routes=[Route("/", endpoint=root, requires='foo')])
+    app = mortar.app()
+
+    with TestClient(app) as client:
+        with ShouldRaise(ContextError):
+            client.get("/")
+
+        mortar.context.add('value', provides='foo')
+
+        response = client.get("/")
+        compare(response.json(), expected={'foo': 'value'})
+
+
+def test_route_requires_multiple():
+
+    async def root(context: Context):
+        return {k: v for (k, v) in context._store.items() if k is not Request}
+
+    mortar = Mortar(routes=[Route("/", endpoint=root, requires=['foo', 'bar'])])
+    app = mortar.app()
+
+    with TestClient(app) as client:
+        mortar.context.add('value1', provides='foo')
+        mortar.context.add('value2', provides='bar')
+
+        response = client.get("/")
+        compare(response.json(), expected={'foo': 'value1', 'bar': 'value2'})
 
 
 def test_default_resolver():

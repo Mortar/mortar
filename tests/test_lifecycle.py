@@ -47,12 +47,12 @@ def make_cm(m, name):
     return cm
 
 
-def make_route(m, name, requires, path='/'):
+def make_route(m, name, tweens, path='/'):
     async def endpoint():
         getattr(m.endpoint, name)()
         return ['result for '+name]
 
-    return Route(path, endpoint, requires=requires)
+    return Route(path, endpoint, tweens=tweens)
 
 
 def test_full_lifecycle_normal():
@@ -60,8 +60,8 @@ def test_full_lifecycle_normal():
     mortar = Mortar(
         lifespan=[make_func(m, 'func1'), make_cm(m, 'cm1'), make_func(m, 'func2')],
         middleware=[make_middleware(m, 'middleware1'), make_middleware(m, 'middleware2')],
-        requires=[make_func(m, 'func3'), make_cm(m, 'cm2'), make_func(m, 'func4')],
-        routes=[make_route(m, 'slash', requires=[make_cm(m, 'cm3'), make_func(m, 'func5')])],
+        tweens=[make_func(m, 'func3'), make_cm(m, 'cm2'), make_func(m, 'func4')],
+        routes=[make_route(m, 'slash', tweens=[make_cm(m, 'cm3'), make_func(m, 'func5')])],
     )
     app = mortar.app()
 
@@ -115,8 +115,8 @@ def test_full_lifecycle_exception():
     mortar = Mortar(
         lifespan=[make_func(m, 'func1'), make_cm(m, 'cm1')],
         middleware=[make_middleware(m, 'middleware')],
-        requires=[make_func(m, 'func2'), make_cm(m, 'cm2')],
-        routes=[Route('/', endpoint, requires=[make_cm(m, 'cm3')])],
+        tweens=[make_func(m, 'func2'), make_cm(m, 'cm2')],
+        routes=[Route('/', endpoint, tweens=[make_cm(m, 'cm3')])],
     )
 
     app = mortar.app()
@@ -150,13 +150,13 @@ def test_full_lifecycle_exception():
     ])
 
 
-def test_multiple_routes_different_requires():
+def test_multiple_routes_different_tweens():
     m = Mock()
     mortar = Mortar(
-        requires=[make_func(m, 'func1'), make_cm(m, 'cm1')],
+        tweens=[make_func(m, 'func1'), make_cm(m, 'cm1')],
         routes=[
-            make_route(m, 'r1', requires=[make_cm(m, 'cm2'), make_func(m, 'func2')], path='/1'),
-            make_route(m, 'r2', requires=[make_func(m, 'func3'), make_cm(m, 'cm3')], path='/2'),
+            make_route(m, 'r1', tweens=[make_cm(m, 'cm2'), make_func(m, 'func2')], path='/1'),
+            make_route(m, 'r2', tweens=[make_func(m, 'func3'), make_cm(m, 'cm3')], path='/2'),
         ],
     )
     app = mortar.app()
@@ -209,8 +209,8 @@ def test_exception_handlers():
 
     mortar = Mortar(
         middleware=[make_middleware(m, 'middleware')],
-        requires=[make_cm(m, 'cm1')],
-        routes=[Route('/', endpoint, requires=[make_cm(m, 'cm2')])],
+        tweens=[make_cm(m, 'cm1')],
+        routes=[Route('/', endpoint, tweens=[make_cm(m, 'cm2')])],
         exception_handlers={SampleException: handler}
     )
     app = mortar.app()
@@ -246,7 +246,7 @@ def test_context_manager_swallows_exception():
             pass
 
     mortar = Mortar(
-        requires=[bad],
+        tweens=[bad],
         routes=[Route('/', endpoint)],
         debug=True,
     )
