@@ -1,9 +1,29 @@
-from mush import Context, ContextError
+from mush import Context, ContextError, returns, requires
 from starlette.requests import Request
 from starlette.testclient import TestClient
 from testfixtures import compare, ShouldRaise
 
 from mortar import Mortar, Route
+
+
+def test_lifespan_provides_resources():
+
+    @returns('resource')
+    def make_resource():
+        return 'the resource'
+
+    @requires('resource')
+    async def root(resource):
+        return resource
+
+    app = Mortar(
+        lifespan=[make_resource],
+        routes=[Route("/", endpoint=root)]
+    ).app()
+
+    with TestClient(app) as client:
+        response = client.get("/")
+        compare(response.json(), expected='the resource')
 
 
 def test_wants_request():

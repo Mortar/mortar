@@ -53,15 +53,16 @@ class RouteHandler:
 
 
 class LifecycleMiddleware:
-    def __init__(self, app, lifespan):
+    def __init__(self, app: ASGIApp, context: Context, lifespan: Sequence[Callable]):
         self.app = app
+        self.context = context
         self.lifespan = Runner(*lifespan)
 
     async def __call__(self, scope, receive, send):
         if scope['type'] == 'lifespan':
             lifespan = self.lifespan.clone()
             lifespan.add(partial(self.app, scope, receive, send))
-            await lifespan()
+            await lifespan(self.context)
         else:
             await self.app(scope, receive, send)
 
@@ -78,7 +79,9 @@ class Mortar:
         self.context = Context(requirement_modifier)
         self.middleware = []
         if lifespan:
-            self.middleware.append(Middleware(LifecycleMiddleware, lifespan=lifespan))
+            self.middleware.append(
+                Middleware(LifecycleMiddleware, context=self.context, lifespan=lifespan)
+            )
         self.middleware.extend(middleware)
         self.tweens = tweens
         self.routes = routes
