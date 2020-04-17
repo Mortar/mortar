@@ -1,12 +1,12 @@
 from contextlib import asynccontextmanager
 
 from starlette.middleware import Middleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, PlainTextResponse
 from starlette.testclient import TestClient
 from testfixtures import compare, ShouldRaise
 from testfixtures.mock import Mock, call
 
-from mortar import Route, Mortar
+from mortar import Route, Mortar, Router, Mount
 
 
 class SampleMiddleware:
@@ -190,6 +190,71 @@ def test_multiple_routes_different_tweens():
             call.endpoint.r2(),
             call.context_manager.cm3.finish(),
             call.context_manager.cm1.finish(),
+        ])
+
+
+def test_mount_router_with_tweens():
+    m = Mock()
+
+    router = Router(
+        tweens=[make_cm(m, 'cm1')],
+        routes=[
+            make_route(m, 'route', tweens=[make_cm(m, 'cm2')], path='/route'),
+        ],
+    )
+
+    mortar = Mortar(
+        tweens=[make_cm(m, 'cm0')],
+        routes=[Mount('/mount', router=router)],
+    )
+
+    app = mortar.app()
+
+    with TestClient(app) as client:
+        response = client.get("/mount/route")
+        compare(response.status_code, expected=200)
+        compare(response.json(), expected=['result for route'])
+
+        compare(m.mock_calls, expected=[
+            call.context_manager.cm0.start(),
+            call.context_manager.cm1.start(),
+            call.context_manager.cm2.start(),
+            call.endpoint.route(),
+            call.context_manager.cm2.finish(),
+            call.context_manager.cm1.finish(),
+            call.context_manager.cm0.finish(),
+        ])
+
+
+def test_mount_app_with_tweens():
+    m = Mock()
+
+    async def app(scope, receive, send):
+        m.app(scope['path'])
+        await PlainTextResponse('some content')(scope, receive, send)
+
+    mortar = Mortar(
+        tweens=[make_cm(m, 'cm0')],
+        routes=[Mount('/mount', app=app)],
+    )
+
+    app = mortar.app()
+
+    with TestClient(app) as client:
+        response = client.get("/mount/foo/bar")
+        compare(response.status_code, expected=200)
+        compare(response.content, expected=b'some content')
+        response = client.get("/mount/foo/baz")
+        compare(response.status_code, expected=200)
+        compare(response.content, expected=b'some content')
+
+        compare(m.mock_calls, expected=[
+            call.context_manager.cm0.start(),
+            call.app('/foo/bar'),
+            call.context_manager.cm0.finish(),
+            call.context_manager.cm0.start(),
+            call.app('/foo/baz'),
+            call.context_manager.cm0.finish(),
         ])
 
 
