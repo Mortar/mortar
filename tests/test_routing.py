@@ -90,3 +90,20 @@ def test_mount_app():
 
     with TestClient(app) as client:
         compare(client.get("/app").content, expected=b'some content')
+
+
+def test_nested_mounts():
+
+    async def app(scope, receive, send):
+        await PlainTextResponse('some content')(scope, receive, send)
+
+    router = Router(routes=[
+        Mount('/level2', app=app)
+    ])
+
+    app = Mortar(routes=[
+        Mount('/level1', name='users', router=router),
+    ]).app()
+
+    with TestClient(app) as client:
+        compare(client.get("/level1/level2").content, expected=b'some content')

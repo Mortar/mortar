@@ -1,8 +1,9 @@
 from functools import partial
-from typing import Callable, Sequence, List, Dict, Union, Type
+from itertools import chain
+from typing import Callable, Sequence, List, Dict, Union, Type, Iterable
 
 from mush.asyncio import Context, Runner
-from mush.declarations import returns_nothing, requires
+from mush.declarations import returns_nothing, requires as mush_requires
 from mush.typing import Requires
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -11,20 +12,26 @@ from starlette.responses import JSONResponse
 from starlette.routing import Route as StarletteRoute, Mount as StarletteMount
 from starlette.types import ASGIApp, Scope, Receive, Send
 
-from .resolvers import requirement_modifier
+from .resolvers import requirement_modifier, combine_requires
+
+
+async def _requires(*args):
+    return
 
 
 class RouteHandler:
 
-    def __init__(self,
-                 context: Context,
-                 endpoint: Callable,
-                 *tweens: Sequence[Callable],
-                 requires: Requires = None):
+    def __init__(
+            self,
+            context: Context,
+            endpoint: Callable,
+            tweens: Iterable[Callable],
+            requires: Requires = None
+    ):
         self.context = context
         self.runner = Runner(*tweens, requirement_modifier=requirement_modifier)
         if requires:
-            self.runner.add(lambda *args: None, requires, returns_nothing)
+            self.runner.add(_requires, requires, returns_nothing)
         self.runner.add(endpoint)
 
     async def __call__(self, request: Request) -> JSONResponse:
@@ -42,17 +49,22 @@ class Route:
             *,
             methods: List[str] = None,
             name: str = None,
-            tweens: Sequence[Callable] = (),
+            tweens: Iterable[Callable] = (),
             requires: Requires = None,
     ):
         self.path: str = path
         self.endpoint: Callable = endpoint
         self.methods: List[str] = methods
         self.name: str = name
-        self.tweens: Sequence[Callable] = tweens
+        self.tweens: Iterable[Callable] = tweens
         self.requires: Requires = requires
 
-    def starlette_route(self, context: Context, *tweens: Callable):
+    def starlette_route(
+            self,
+            context: Context,
+            tweens: Iterable[Callable],
+            requires: Requires = None
+    ):
         # https://github.com/encode/starlette/issues/886 covers why we reference __call__
         # on async callable objects.
         return StarletteRoute(
@@ -60,8 +72,8 @@ class Route:
             RouteHandler(
                 context,
                 self.endpoint,
-                *tweens, *self.tweens,
-                requires=self.requires
+                chain(tweens, self.tweens),
+                requires=combine_requires(requires, self.requires)
             ).__call__,
             methods=self.methods,
             name=self.name
@@ -69,10 +81,18 @@ class Route:
 
 
 class MountedAppMiddleware:
-    def __init__(self, context: Context, app: ASGIApp, *tweens: Callable):
+    def __init__(
+            self,
+            context: Context,
+            app: ASGIApp,
+            tweens: Iterable[Callable] = (),
+            requires: Requires = None
+    ):
         self.context = context
         self.runner = Runner(*tweens)
-        self.runner.add(app, requires(Scope, Receive, Send), returns_nothing)
+        if requires:
+            self.runner.add(_requires, requires, returns_nothing)
+        self.runner.add(app, mush_requires(Scope, Receive, Send), returns_nothing)
 
     async def __call__(self, scope, receive, send):
         context = self.context.nest()
@@ -95,14 +115,19 @@ class Mount:
         self.router = router
         self.name = name
 
-    def starlette_route(self, context: Context, *tweens: Callable):
+    def starlette_route(
+            self, context: Context,
+            tweens: Iterable[Callable],
+            requires: Requires = None
+    ):
         if self.router is None:
             routes = None
             app = self.app
-            if app is not None and tweens:
-                app = MountedAppMiddleware(context, app, *tweens)
+            tweens = tuple(tweens)  # unwind any chain passed in
+            if app is not None and (tweens or requires):
+                app = MountedAppMiddleware(context, app, tweens, requires)
         else:
-            routes = self.router.starlette_routes(context, *tweens)
+            routes = self.router.starlette_routes(context, tweens, requires)
             app = None
         return StarletteMount(self.path, app, routes, self.name)
 
@@ -111,15 +136,22 @@ class Router:
     def __init__(
             self,
             routes: List[Union[Route, Mount]],
-            tweens: Sequence[Callable] = (),
+            tweens: Iterable[Callable] = (),
             requires: Requires = None,
     ):
         self.routes: List[Union[Route, Mount]] = routes
-        self.tweens: Sequence[Callable] = tweens
+        self.tweens: Iterable[Callable] = tweens
         self.requires: Requires = requires
 
-    def starlette_routes(self, context: Context, *tweens: Callable):
-        return [route.starlette_route(context, *tweens, *self.tweens) for route in self.routes]
+    def starlette_routes(
+            self,
+            context: Context,
+            tweens: Iterable[Callable] = (),
+            requires: Requires = None
+    ):
+        requires = combine_requires(requires, self.requires)
+        return [route.starlette_route(context, chain(tweens, self.tweens), requires)
+                for route in self.routes]
 
 
 class LifecycleMiddleware:
@@ -139,13 +171,16 @@ class LifecycleMiddleware:
 
 class Mortar:
 
-    def __init__(self,
-                 lifespan: Sequence[Callable] = (),
-                 middleware: Sequence[Middleware] = (),
-                 tweens: Sequence[Callable] = (),
-                 routes: List[Union[Route, Mount]] = None,
-                 exception_handlers: Dict[Union[int, Type[Exception]], Callable] = None,
-                 debug: bool = False):
+    def __init__(
+            self,
+            lifespan: Sequence[Callable] = (),
+            middleware: Sequence[Middleware] = (),
+            tweens: Sequence[Callable] = (),
+            requires: Requires = None,
+            routes: List[Union[Route, Mount]] = None,
+            exception_handlers: Dict[Union[int, Type[Exception]], Callable] = None,
+            debug: bool = False
+    ):
         self.context = Context(requirement_modifier)
         self.middleware = []
         if lifespan:
@@ -153,7 +188,7 @@ class Mortar:
                 Middleware(LifecycleMiddleware, context=self.context, lifespan=lifespan)
             )
         self.middleware.extend(middleware)
-        self.router = Router(routes, tweens)
+        self.router = Router(routes, tweens, requires)
         self.exception_handlers = exception_handlers
         self.debug = debug
 
