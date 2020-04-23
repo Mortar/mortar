@@ -3,14 +3,36 @@ version: 2.1
 orbs:
   python: cjw296/python-ci@1.2
 
+jobs:
+  pip-run-tests:
+    parameters:
+      image:
+        type: string
+    docker:
+      - image: << parameters.image >>
+    steps:
+      - run:
+          name: Avoid hosts unknown for github
+          command: mkdir ~/.ssh/ && echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
+      - run:
+          name: "Install mush 3.x"
+          command: |
+            cd ~
+            git clone git@github.com:cjw296/mush.git
+            cd mush
+            git checkout 3.x
+            sudo pip install -e .
+      - python/pip-run-tests:
+          command: "pytest --cov"
+
 common: &common
   jobs:
 
-    - python/pip-run-tests:
+    - pip-run-tests:
         name: python36
         image: circleci/python:3.6
 
-    - python/pip-run-tests:
+    - pip-run-tests:
         name: python37
         image: circleci/python:3.7
 
