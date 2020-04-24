@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 
 from starlette.middleware import Middleware
 from starlette.responses import JSONResponse, PlainTextResponse
@@ -7,6 +6,7 @@ from testfixtures import compare, ShouldRaise
 from testfixtures.mock import Mock, call
 
 from mortar import Route, Mortar, Router, Mount
+from .compat import PY_37_PLUS
 
 
 class SampleMiddleware:
@@ -32,17 +32,36 @@ def make_func(m, name):
 
 def make_cm(m, name):
 
-    @asynccontextmanager
-    async def cm():
-        m_ = getattr(m.context_manager, name)
-        m_.start()
-        try:
-            yield
-        except:
-            m_.exception()
-            raise
-        else:
-            m_.finish()
+    if PY_37_PLUS:
+
+        from contextlib import asynccontextmanager
+        
+        @asynccontextmanager
+        async def cm():
+            m_ = getattr(m.context_manager, name)
+            m_.start()
+            try:
+                yield
+            except:
+                m_.exception()
+                raise
+            else:
+                m_.finish()
+
+    else:
+
+        class cm:
+
+            m_ = getattr(m.context_manager, name)
+
+            async def __aenter__(self):
+                self.m_.start()
+
+            async def __aexit__(self, type_, obj, tb):
+                if type_ is None:
+                    self.m_.finish()
+                else:
+                    self.m_.exception()
 
     return cm
 
@@ -303,15 +322,16 @@ def test_context_manager_swallows_exception():
     async def endpoint():
         raise Exception('boom!')
 
-    @asynccontextmanager
-    async def bad():
-        try:
-            yield
-        except:
+    class Bad:
+
+        async def __aenter__(self):
             pass
 
+        async def __aexit__(self, type_, obj, tb):
+            return True
+
     mortar = Mortar(
-        tweens=[bad],
+        tweens=[Bad],
         routes=[Route('/', endpoint)],
         debug=True,
     )
